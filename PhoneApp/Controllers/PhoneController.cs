@@ -78,9 +78,11 @@ namespace PhoneApp.Controllers
                 var p = await dbContext.Phones.FindAsync(id.Value);
                 if (p != null)
                 {
-                    var vm = new PhoneCreateViewModel { Id = p.Id, Name = p.Name, Price = p.Price };
+                    var vm = new PhoneCreateViewModel { Id = p.Id, Name = p.Name, Price = p.Price, CompanyId=p.CompanyId };
                     var cs = await dbContext.Companies.ToListAsync();
                     vm.Companies = new SelectList(cs, "Id", "Name");
+                    var selected = vm.Companies.Where(x => x.Value == vm.CompanyId.ToString()).First();
+                    selected.Selected = true;
                     return View(vm);
                 }
             }
