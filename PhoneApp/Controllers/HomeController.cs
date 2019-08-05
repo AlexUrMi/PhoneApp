@@ -10,9 +10,17 @@ namespace PhoneApp.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly AppDbContext dbContext;
+
+        public HomeController(AppDbContext dbContext)
+        {
+            this.dbContext = dbContext;
+        }
         public IActionResult Index()
         {
-            return View();
+            int cnt = dbContext.Phones.Count();
+            return Content($"Phones count is {cnt}");
+            //return View();
         }
 
         public IActionResult Privacy()
