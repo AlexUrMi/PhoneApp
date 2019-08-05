@@ -55,5 +55,88 @@ namespace PhoneApp.Controllers
 
             return RedirectToAction("Index");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Details (int? id)
+        {
+            if (id.HasValue)
+            {
+                var p = await dbContext.Phones.FindAsync(id.Value);
+                if (p != null)
+                {
+                    return View(p);
+                }
+            }
+            return NotFound();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id.HasValue)
+            {
+                var p = await dbContext.Phones.FindAsync(id.Value);
+                if (p != null)
+                {
+                    var vm = new PhoneCreateViewModel { Id = p.Id, Name = p.Name, Price = p.Price };
+                    var cs = await dbContext.Companies.ToListAsync();
+                    vm.Companies = new SelectList(cs, "Id", "Name");
+                    return View(vm);
+                }
+            }
+            return NotFound();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Edit(PhoneCreateViewModel phone) 
+        {
+            if(phone != null)
+            {
+                if (ModelState.IsValid)
+                {
+                    var p = new Phone { Id = phone.Id, CompanyId = phone.CompanyId, Name = phone.Name, Price = phone.Price };
+
+                    dbContext.Phones.Update(p);
+                    await dbContext.SaveChangesAsync();
+                    return RedirectToAction("Index");
+                } else
+                {
+                    return View(phone);
+                }
+            }
+            return NotFound();
+        }
+
+        [HttpGet]
+        [ActionName("Delete")]
+        public async Task<IActionResult> ConfirmDelete(int? id)
+        {
+            if(id != null)
+            {
+                var ph = await dbContext.Phones.FirstOrDefaultAsync(p => p.Id == id);
+                if(ph != null)
+                {
+                    return View(ph);
+                }
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id != null)
+            {
+                var ph = await dbContext.Phones.FirstOrDefaultAsync(p => p.Id == id);
+                if (ph != null)
+                {
+                    dbContext.Phones.Remove(ph);
+                    await dbContext.SaveChangesAsync();
+                    return RedirectToAction("Index");
+                }
+               
+            }
+            return NotFound();
+        }
+
     }
 }
