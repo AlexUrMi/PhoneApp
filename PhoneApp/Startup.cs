@@ -62,7 +62,7 @@ namespace PhoneApp
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Phone}/{action=Index}/{id?}");
             });
         }
     }
