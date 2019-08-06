@@ -36,6 +36,9 @@ namespace PhoneApp
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
+            services.AddTransient<ICompanyRepository, CompanyRepository>();
+            services.AddTransient<IPhoneRepository, PhoneRepository>();
+
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

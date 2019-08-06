@@ -13,18 +13,23 @@ namespace PhoneApp.Controllers
 {
     public class PhoneController : Controller
     {
-        private readonly AppDbContext dbContext;
+        private readonly IPhoneRepository phoneRepository;
+        private readonly ICompanyRepository companyRepository;
         private readonly ILogger<PhoneController> logger;
 
-        public PhoneController(AppDbContext dbContext, ILogger<PhoneController> logger)
+        public PhoneController(IPhoneRepository phoneRepository, 
+            ICompanyRepository companyRepository, ILogger<PhoneController> logger)
         {
-            this.dbContext = dbContext;
+            this.phoneRepository = phoneRepository;
+            this.companyRepository = companyRepository;
             this.logger = logger;
         }
+
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var list = await dbContext.Phones.Include("Company").ToListAsync();
+            var list = phoneRepository.GetWithInclude(p => p.Company);
             logger.LogInformation($"PhoneController.Index method called!");
             return View(list);
         }
@@ -33,7 +38,7 @@ namespace PhoneApp.Controllers
         public async Task<IActionResult> Create()
         {
             var vm = new PhoneCreateViewModel();
-            var list = await dbContext.Companies.ToListAsync();
+            var list = companyRepository.Get();
             vm.Companies = new SelectList(list, "Id", "Name");
 
             return View(vm);
@@ -44,9 +49,10 @@ namespace PhoneApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                dbContext.Phones.Add(phone);
-                var id = await dbContext.SaveChangesAsync();
-                logger.LogInformation($"Was added product with id {id}");
+                //dbContext.Phones.Add(phone);
+                //var id = await dbContext.SaveChangesAsync();
+                phoneRepository.Create(phone);
+                logger.LogInformation($"Was added product with id {phone.Id}");
             }
             else
             {
@@ -61,7 +67,7 @@ namespace PhoneApp.Controllers
         {
             if (id.HasValue)
             {
-                var p = await dbContext.Phones.FindAsync(id.Value);
+                var p =  phoneRepository.FindById(id.Value);
                 if (p != null)
                 {
                     return View(p);
@@ -75,11 +81,11 @@ namespace PhoneApp.Controllers
         {
             if (id.HasValue)
             {
-                var p = await dbContext.Phones.FindAsync(id.Value);
+                var p = phoneRepository.FindById(id.Value);
                 if (p != null)
                 {
                     var vm = new PhoneCreateViewModel { Id = p.Id, Name = p.Name, Price = p.Price, CompanyId=p.CompanyId };
-                    var cs = await dbContext.Companies.ToListAsync();
+                    var cs = companyRepository.Get();
                     vm.Companies = new SelectList(cs, "Id", "Name");
                     var selected = vm.Companies.Where(x => x.Value == vm.CompanyId.ToString()).First();
                     selected.Selected = true;
@@ -97,8 +103,7 @@ namespace PhoneApp.Controllers
                 {
                     var p = new Phone { Id = phone.Id, CompanyId = phone.CompanyId, Name = phone.Name, Price = phone.Price };
 
-                    dbContext.Phones.Update(p);
-                    await dbContext.SaveChangesAsync();
+                    phoneRepository.Update(p);
                     return RedirectToAction("Index");
                 } else
                 {
@@ -114,9 +119,10 @@ namespace PhoneApp.Controllers
         {
             if(id != null)
             {
-                var ph = await dbContext.Phones.FirstOrDefaultAsync(p => p.Id == id);
+                var ph = phoneRepository.FindById(id.Value);
                 if(ph != null)
                 {
+                    
                     return View(ph);
                 }
             }
@@ -128,11 +134,10 @@ namespace PhoneApp.Controllers
         {
             if (id != null)
             {
-                var ph = await dbContext.Phones.FirstOrDefaultAsync(p => p.Id == id);
+                var ph = phoneRepository.FindById(id.Value);
                 if (ph != null)
                 {
-                    dbContext.Phones.Remove(ph);
-                    await dbContext.SaveChangesAsync();
+                    phoneRepository.Remove(ph);
                     return RedirectToAction("Index");
                 }
                
