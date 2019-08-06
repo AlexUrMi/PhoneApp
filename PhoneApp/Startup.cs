@@ -39,6 +39,9 @@ namespace PhoneApp
             services.AddTransient<ICompanyRepository, CompanyRepository>();
             services.AddTransient<IPhoneRepository, PhoneRepository>();
 
+            services.AddTransient<ICompanyAsyncRepository, CompanyAsyncRepository>();
+            services.AddTransient<IPhoneAsyncRepository, PhoneAsyncRepository>();
+
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }

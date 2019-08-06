@@ -19,6 +19,4 @@ namespace PhoneApp.Models
         IEnumerable<TEntity> GetWithInclude(Func<TEntity, bool> predicate,
             params Expression<Func<TEntity, object>>[] includeProperties);
     }
-
-   
 }
