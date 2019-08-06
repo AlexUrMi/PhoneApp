@@ -17,6 +17,11 @@
 
 
   <ItemGroup>
+    <ProjectReference Include="..\PhoneApp.Core\PhoneApp.Core.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
     <Content Update="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
